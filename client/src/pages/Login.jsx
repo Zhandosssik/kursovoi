@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import api from '../services/api'; // АПИ-ді импорттауды ұмытпаңыз
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -11,12 +12,19 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await login(email, password);
+            // СЕРВЕРГЕ СҰРАНЫС ЖІБЕРУ
+            const response = await api.post('/auth/login', { email, password });
+            
+            // Серверден келген user мен token-ді контекстке жіберу
+            login(response.data.user, response.data.token);
+            
             navigate('/dashboard');
         } catch (error) {
-            alert('Қате: Логин немесе пароль дұрыс емес!');
+            console.error(error);
+            alert('Қате: Логин немесе пароль дұрыс емес немесе сервер жұмыс істемей тұр!');
         }
     };
+    // ... қалған код өзгеріссіз
 
     return (
         <div className="auth-page">

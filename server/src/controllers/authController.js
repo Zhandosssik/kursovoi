@@ -5,35 +5,37 @@ require('dotenv').config();
 
 // Қолданушыны тіркеу (Регистрация)
 // Қолданушыны тіркеу (Регистрация)
+// Қолданушыны тіркеу (Регистрация)
 const register = async (req, res) => {
     try {
-        // 1. Фронтендтен келетін деректерге groupId қостық
-        const { firstName, lastName, email, password, roleName, groupId } = req.body;
+        // 1. Фронтендтен келетін деректерді қабылдау (атауларды сәйкестендірдік)
+        const { first_name, last_name, email, password, role, groupId } = req.body;
 
-        // Рөлдің ID-ін дерекқордан іздеу
-        const roleQuery = await pool.query('SELECT id FROM roles WHERE name = $1', [roleName]);
+        // 2. Рөлдің ID-ін дерекқордан іздеу (role қолданылады)
+        const roleQuery = await pool.query('SELECT id FROM roles WHERE name = $1', [role]);
         if (roleQuery.rows.length === 0) {
             return res.status(400).json({ message: 'Мұндай рөл табылмады' });
         }
         const roleId = roleQuery.rows[0].id;
 
-        // Электрондық поштаның қайталанбауын тексеру
+        // 3. Электрондық поштаны тексеру
         const userExists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
         if (userExists.rows.length > 0) {
             return res.status(400).json({ message: 'Бұл электрондық пошта тіркелген' });
         }
 
-        // Құпия сөзді хэштеу
+        // 4. Құпия сөзді хэштеу
         const salt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(password, salt);
 
-        // 2. ЖАҢА ЛОГИКА: Егер студент болса және топ таңдалса, соны аламыз, әйтпесе null
-        const groupValue = (roleName === 'student' && groupId) ? groupId : null;
+        // 5. Студент болса топты анықтау
+        const groupValue = (role === 'student' && groupId) ? groupId : null;
 
-        // 3. ЖАҢА СҰРАНЫС: group_id бағанын қосып сақтаймыз
+        // 6. Дерекқорға сақтау
+        // ЕСКЕРТУ: Дерекқорыңызда 'group_id' бағаны бар екеніне көз жеткізіңіз
         const newUser = await pool.query(
             'INSERT INTO users (role_id, first_name, last_name, email, password_hash, group_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, first_name, email',
-            [roleId, firstName, lastName, email, passwordHash, groupValue]
+            [roleId, first_name, last_name, email, passwordHash, groupValue]
         );
 
         res.status(201).json({ 
@@ -42,7 +44,8 @@ const register = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error.message);
+        // Сервер консоліне (терминалға) нақты қатені шығару
+        console.error("Тіркелу қатесі:", error.message);
         res.status(500).json({ message: 'Серверде қате шықты' });
     }
 };
