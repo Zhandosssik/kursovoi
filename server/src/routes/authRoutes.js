@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { register, login } = require('../controllers/authController');
+// getPublicGroups-ті импортқа қостық
+const { register, login, getPublicGroups } = require('../controllers/authController'); 
 
-// POST /api/auth/register
 router.post('/register', register);
-
-// POST /api/auth/login
 router.post('/login', login);
+router.get('/groups', getPublicGroups); // ЖАҢА РОУТ (Топтарды алу үшін)
 
 module.exports = router;

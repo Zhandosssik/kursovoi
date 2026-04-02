@@ -4,14 +4,12 @@ const { pool } = require('../config/db');
 require('dotenv').config();
 
 // Қолданушыны тіркеу (Регистрация)
-// Қолданушыны тіркеу (Регистрация)
-// Қолданушыны тіркеу (Регистрация)
 const register = async (req, res) => {
     try {
-        // 1. Фронтендтен келетін деректерді қабылдау (атауларды сәйкестендірдік)
-        const { first_name, last_name, email, password, role, groupId } = req.body;
+        // 1. Фронтендтен келетін деректерді қабылдау (group_id қолданамыз)
+        const { first_name, last_name, email, password, role, group_id } = req.body;
 
-        // 2. Рөлдің ID-ін дерекқордан іздеу (role қолданылады)
+        // 2. Рөлдің ID-ін дерекқордан іздеу
         const roleQuery = await pool.query('SELECT id FROM roles WHERE name = $1', [role]);
         if (roleQuery.rows.length === 0) {
             return res.status(400).json({ message: 'Мұндай рөл табылмады' });
@@ -28,11 +26,10 @@ const register = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(password, salt);
 
-        // 5. Студент болса топты анықтау
-        const groupValue = (role === 'student' && groupId) ? groupId : null;
+        // 5. Студент болса топты анықтау (group_id қолданылады)
+        const groupValue = (role === 'student' && group_id) ? group_id : null;
 
         // 6. Дерекқорға сақтау
-        // ЕСКЕРТУ: Дерекқорыңызда 'group_id' бағаны бар екеніне көз жеткізіңіз
         const newUser = await pool.query(
             'INSERT INTO users (role_id, first_name, last_name, email, password_hash, group_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, first_name, email',
             [roleId, first_name, last_name, email, passwordHash, groupValue]
@@ -44,7 +41,6 @@ const register = async (req, res) => {
         });
 
     } catch (error) {
-        // Сервер консоліне (терминалға) нақты қатені шығару
         console.error("Тіркелу қатесі:", error.message);
         res.status(500).json({ message: 'Серверде қате шықты' });
     }
@@ -55,7 +51,7 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // 1. Қолданушыны іздеу және оның рөлін қоса алу (JOIN)
+        // 1. Қолданушыны іздеу және оның рөлін қоса алу
         const userQuery = await pool.query(`
             SELECT u.*, r.name as role_name 
             FROM users u 
@@ -83,13 +79,17 @@ const login = async (req, res) => {
             }
         };
 
-        // Токен 24 сағатқа жарамды
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
 
         res.status(200).json({
             message: 'Жүйеге сәтті кірдіңіз',
             token,
-            user: { id: user.id, firstName: user.first_name, lastName: user.last_name, role: user.role_name }
+            user: { 
+                id: user.id, 
+                firstName: user.first_name, 
+                lastName: user.last_name, 
+                role: user.role_name 
+            }
         });
 
     } catch (error) {
@@ -98,4 +98,16 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = { register, login };
+// ЖАҢА: Тіркелу парақшасына барлық топтарды шығарып беру
+const getPublicGroups = async (req, res) => {
+    try {
+        const groups = await pool.query('SELECT id, name FROM groups ORDER BY name ASC');
+        res.json(groups.rows);
+    } catch (error) {
+        console.error("Топтарды алу қатесі:", error.message);
+        res.status(500).json({ message: 'Топтарды алу қатесі' });
+    }
+};
+
+
+module.exports = { register, login, getPublicGroups };

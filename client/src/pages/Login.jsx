@@ -1,13 +1,20 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
-import api from '../services/api'; // АПИ-ді импорттауды ұмытпаңыз
+import { useNavigate, Link, Navigate } from 'react-router-dom';
+import api from '../services/api';
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { login } = useContext(AuthContext);
+    
+    // AuthContext-тен login функциясымен қатар user-ді де аламыз
+    const { login, user } = useContext(AuthContext);
     const navigate = useNavigate();
+
+    // Егер қолданушы жүйеге кіріп тұрса, Dashboard-қа лақтырады
+    if (user) {
+        return <Navigate to="/dashboard" replace />;
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,7 +31,6 @@ function Login() {
             alert('Қате: Логин немесе пароль дұрыс емес немесе сервер жұмыс істемей тұр!');
         }
     };
-    // ... қалған код өзгеріссіз
 
     return (
         <div className="auth-page">

@@ -1,7 +1,16 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Link, Navigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 function Home() {
+    const { user } = useContext(AuthContext);
+
+    // Егер адам жүйеге кіріп тұрса (user бар болса), 
+    // оны басты бетте ұстамай, бірден Бақылау тақтасына (Dashboard) лақтырамыз
+    if (user) {
+        return <Navigate to="/dashboard" replace />;
+    }
+
     return (
         <div className="home-page">
             {/* Hero Section */}

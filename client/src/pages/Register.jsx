@@ -1,36 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
 import api from '../services/api';
-import { useNavigate, Link } from 'react-router-dom';
 
 function Register() {
     const [formData, setFormData] = useState({
-        firstName: '', lastName: '', email: '', password: '', role: 'student', groupId: ''
+        firstName: '', lastName: '', email: '', password: '', role: 'student', group_id: ''
     });
+    const [groups, setGroups] = useState([]); 
     const navigate = useNavigate();
 
-    // ... (импорттар сол қалпында қалады)
+    // AuthContext-тен user-ді аламыз
+    const { user } = useContext(AuthContext);
+
+    // Егер қолданушы жүйеге кіріп тұрса, Dashboard-қа лақтырады
+    if (user) {
+        return <Navigate to="/dashboard" replace />;
+    }
+
+    // Парақша ашылғанда топтар тізімін базадан жүктеп алу
+    useEffect(() => {
+        const fetchGroups = async () => {
+            try {
+                const res = await api.get('/auth/groups');
+                setGroups(res.data);
+            } catch (error) {
+                console.error("Топтарды жүктеу қатесі", error);
+            }
+        };
+        fetchGroups();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // МҰҚИЯТ ҚАРА: Бэкенд snake_case (төменгі сызық) күтеді
         const dataToSend = {
-            first_name: formData.firstName,  // firstName -> first_name
-            last_name: formData.lastName,    // lastName -> last_name
+            first_name: formData.firstName,  
+            last_name: formData.lastName,    
             email: formData.email,
             password: formData.password,
             role: formData.role,
-            group_id: formData.role === 'student' ? (formData.groupId ? parseInt(formData.groupId) : null) : null
+            group_id: formData.role === 'student' ? (formData.group_id ? parseInt(formData.group_id) : null) : null
         };
 
-        console.log("Серверге кетіп жатқан нақты деректер:", dataToSend);
-
         try {
-            const response = await api.post('/auth/register', dataToSend);
+            await api.post('/auth/register', dataToSend);
             alert('Тіркелу сәтті аяқталды!');
             navigate('/login');
         } catch (error) {
-            // Қате болса, сервер нақты не декенін көреміз
             console.error("Серверден келген жауап:", error.response?.data);
             const errorMsg = error.response?.data?.message || 'Сервер қатесі';
             alert('Қате: ' + errorMsg);
@@ -70,7 +87,7 @@ function Register() {
                         <label>Электрондық пошта</label>
                         <div className="input-wrapper">
                             <svg className="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                            <input type="email" placeholder="zangar@gmail.com" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} required />
+                            <input type="email" placeholder="университет поштасы" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} required />
                         </div>
                     </div>
 
@@ -88,7 +105,7 @@ function Register() {
                             <svg className="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
                             <select 
                                 value={formData.role} 
-                                onChange={(e) => setFormData({...formData, role: e.target.value})}
+                                onChange={(e) => setFormData({...formData, role: e.target.value, group_id: ''})}
                                 className="modern-select"
                                 required
                             >
@@ -98,12 +115,23 @@ function Register() {
                         </div>
                     </div>
 
+                    {/* Топты тізімнен таңдау */}
                     {formData.role === 'student' && (
                         <div className="form-group-modern fade-in-up">
-                            <label>Топ нөмірі (ID)</label>
+                            <label>Оқитын тобыңыз</label>
                             <div className="input-wrapper">
                                 <svg className="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                                <input type="number" placeholder="Мысалы: 1" value={formData.groupId} onChange={(e) => setFormData({...formData, groupId: e.target.value})} required={formData.role === 'student'} />
+                                <select 
+                                    className="modern-select"
+                                    value={formData.group_id} 
+                                    onChange={(e) => setFormData({...formData, group_id: e.target.value})} 
+                                    required={formData.role === 'student'}
+                                >
+                                    <option value="" disabled>Топты таңдаңыз...</option>
+                                    {groups.map(group => (
+                                        <option key={group.id} value={group.id}>{group.name}</option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
                     )}

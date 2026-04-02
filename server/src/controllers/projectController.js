@@ -3,11 +3,12 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Жобаны жүктеу (Загрузка проекта)
+// Жобаны жүктеу (Загрузка проекта студентом)
 const uploadProject = async (req, res) => {
     const client = await pool.connect();
     try {
-        const { title, description } = req.body;
+        // assignment_id қосылды (Фронтендтен келеді)
+        const { title, description, assignment_id } = req.body;
         const studentId = req.user.id;
 
         if (!req.file) {
@@ -16,9 +17,13 @@ const uploadProject = async (req, res) => {
 
         await client.query('BEGIN');
 
+        // Егер студент тапсырмасыз жүктесе (еркін тақырып), онда null болады
+        const targetAssignmentId = assignment_id ? assignment_id : null;
+
+        // projects кестесіне assignment_id-ді де сақтаймыз
         const projectResult = await client.query(
-            'INSERT INTO projects (student_id, title, description) VALUES ($1, $2, $3) RETURNING id',
-            [studentId, title, description]
+            'INSERT INTO projects (student_id, title, description, assignment_id) VALUES ($1, $2, $3, $4) RETURNING id',
+            [studentId, title, description, targetAssignmentId]
         );
         const projectId = projectResult.rows[0].id;
 
@@ -34,7 +39,7 @@ const uploadProject = async (req, res) => {
         res.status(201).json({ message: 'Жоба сәтті жүктелді!', projectId });
     } catch (error) {
         await client.query('ROLLBACK');
-        console.error(error);
+        console.error("Жоба жүктеу қатесі:", error);
         res.status(500).json({ message: 'Серверде қате шықты' });
     } finally {
         client.release();
@@ -47,15 +52,19 @@ const getProjects = async (req, res) => {
         const userId = req.user.id;     
         const userRole = req.user.role; 
 
+        // LEFT JOIN assignments a ON p.assignment_id = a.id қостық, 
+        // жобаның қай тапсырмаға тиесілі екенін (a.title) көру үшін
         let query = `
-            SELECT p.id, p.title, p.description, p.status, p.created_at,
+            SELECT p.id, p.title, p.description, p.status, p.created_at, p.assignment_id,
                    u.first_name, u.last_name, u.group_id,
                    f.file_url, f.file_type,
-                   g.repo_url, g.repo_name, g.language, g.stars_count
+                   g.repo_url, g.repo_name, g.language, g.stars_count,
+                   a.title as assignment_title
             FROM projects p
             JOIN users u ON p.student_id = u.id
             LEFT JOIN files f ON p.id = f.project_id
             LEFT JOIN github_links g ON p.id = g.project_id
+            LEFT JOIN assignments a ON p.assignment_id = a.id
         `;
 
         let values = [];
@@ -73,7 +82,7 @@ const getProjects = async (req, res) => {
         const result = await pool.query(query, values);
         res.status(200).json(result.rows);
     } catch (error) {
-        console.error(error);
+        console.error("Жобаларды алу қатесі:", error);
         res.status(500).json({ message: 'Серверде қате шықты' });
     }
 };
@@ -122,5 +131,4 @@ const generateAIReview = async (req, res) => {
     }
 };
 
-// БАРЛЫҚ ФУНКЦИЯЛАРДЫ БІР ҒАНА ЖОЛМЕН ЭКСПОРТТАУ:
 module.exports = { uploadProject, getProjects, generateAIReview };

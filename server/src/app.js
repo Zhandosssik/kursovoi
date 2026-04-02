@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const projectRoutes = require('./routes/projectRoutes');
 const groupRoutes = require('./routes/groupRoutes');
+const assignmentRoutes = require('./routes/assignmentRoutes'); // Жаңа роут
 require('dotenv').config();
 const { pool } = require('./config/db');
 
@@ -22,6 +23,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/groups', groupRoutes);
+app.use('/api/assignments', assignmentRoutes);
 
 const PORT = process.env.PORT || 5000;
 
