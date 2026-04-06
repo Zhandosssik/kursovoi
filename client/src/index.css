@@ -1,21 +1,60 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* 2. БҮКІЛ САЙТТЫҢ НЕГІЗІ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+  --primary-color: #2997ff;
+  --primary-hover: #147ce5;
+  --accent-secondary: #5e5ce6;
+  --bg-page: #000000;
+  --bg-elevated: #1c1c1e;
+  --bg-elevated-2: #2c2c2e;
+  --bg-soft: #1c1c1e;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --text-main: #f5f5f7;
+  --text-muted: #a1a1a6;
+  --text-dim: #6e6e73;
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-sm: 10px;
+  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 28px rgba(0, 0, 0, 0.55);
+  --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.55);
+  --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --accent-upload: #64d2ff;
+  --accent-github: #8e8e93;
+  --transition-fast: 0.22s var(--ease-apple);
+  --transition-med: 0.4s var(--ease-apple);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #F8F9FA; 
-  color: #333333;
+  font-family: var(--font-sans);
+  background-color: var(--bg-page);
+  color: var(--text-main);
 }
 
 h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: -0.03em;
 }
 
-/* 🟡 АКЦЕНТТЕР МЕН БАТЫРМАЛАР (CTA) */
-.btn-primary, .btn-outline, .accent-text {
-  font-family: var(--font-accent); /* Батырмалар Circe болады */
+.btn-primary,
+.btn-outline,
+.accent-text {
+  font-family: var(--font-sans);
 }
 
 /* ... ары қарай бағанағы auth-container, hero-section кодтары қала береді ... */
@@ -86,23 +125,23 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
   box-shadow: 0 0 0 3px rgba(0, 86, 210, 0.1);
 }
 
-/* Басты батырма */
-.btn-primary {
+/* Ескі auth карточкалары (қажет болса) */
+.auth-card .btn-primary {
   width: 100%;
   padding: 12px;
-  background-color: #0056D2; /* Trust Blue */
-  color: #FFFFFF;
+  background-color: var(--primary-color);
+  color: #fff;
   font-size: 16px;
   font-weight: 500;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-fast);
   margin-top: 10px;
 }
 
-.btn-primary:hover {
-  background-color: #0043A8; /* Басқанда сәл қоюланады */
+.auth-card .btn-primary:hover {
+  background-color: var(--primary-hover);
 }
 
 .auth-link {
@@ -128,24 +167,10 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
    ЖАҢА БАСТЫ ПАРАҚША (Home Redesign - Шаг 1) 
    ========================================= */
 
-:root {
-  --primary-color: #0056D2;
-  --primary-hover: #0043A8;
-  --ai-accent: #6366F1;
-  --bg-soft: #F8FAFC;
-  --text-main: #111827;
-  --text-muted: #4B5563;
-  --radius-lg: 16px;
-  --radius-md: 12px;
-  --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-}
-
 .home-page {
-  background-color: var(--bg-soft);
-  /* Добавляем стильный паттерн в виде точек */
-  background-image: radial-gradient(#D1D5DB 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-color: var(--bg-page);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -178,13 +203,20 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(99, 102, 241, 0.1);
-  color: var(--ai-accent);
+  background: rgba(41, 151, 255, 0.12);
+  color: var(--primary-color);
   padding: 8px 16px;
-  border-radius: 30px;
-  font-size: 14px;
+  border-radius: 100px;
+  font-size: 13px;
   font-weight: 600;
   margin-bottom: 24px;
+  border: 1px solid var(--border-subtle);
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.badge:hover {
+  transform: scale(1.02);
+  border-color: var(--border-strong);
 }
 
 .hero-title {
@@ -197,9 +229,10 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 }
 
 .hero-title span {
-  background: linear-gradient(90deg, var(--primary-color), var(--ai-accent));
+  background: linear-gradient(135deg, #ffffff 0%, #a1a1a6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .hero-description {
@@ -217,13 +250,13 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 }
 
 .btn-lg {
-  padding: 0 32px; /* Убираем вертикальный паддинг, используем height */
-  height: 52px;    /* Фиксированная высота для идеальной пропорции */
-  font-size: 17px; /* Увеличили шрифт */
+  padding: 0 32px;
+  height: 52px;
+  font-size: 17px;
   font-weight: 600;
-  border-radius: var(--radius-md);
+  border-radius: 980px;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -231,35 +264,35 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 
 .btn-primary {
   background-color: var(--primary-color);
-  color: white;
-  box-shadow: 0 4px 14px rgba(0, 86, 210, 0.25);
-  border: 1px solid transparent; /* Чтобы рамки не прыгали */
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(41, 151, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .btn-primary:hover {
   background-color: var(--primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 86, 210, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(41, 151, 255, 0.45);
 }
 
 .btn-secondary {
-  background-color: white;
+  background-color: var(--bg-elevated-2);
   color: var(--text-main);
-  border: 1px solid #D1D5DB; /* Более мягкая рамка */
-  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-strong);
+  box-shadow: none;
 }
 
 .btn-secondary:hover {
-  background-color: #F9FAFB;
-  transform: translateY(-2px);
-  border-color: #9CA3AF;
+  background-color: #3a3a3c;
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 /* --- STATS --- */
 .hero-stats {
   display: flex;
   gap: 40px;
-  border-top: 1px solid #E5E7EB;
+  border-top: 1px solid var(--border-subtle);
   padding-top: 24px;
 }
 
@@ -289,28 +322,30 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
   position: absolute;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0) 70%);
+  background: radial-gradient(circle, rgba(41, 151, 255, 0.18) 0%, transparent 70%);
   border-radius: 50%;
   z-index: 0;
 }
 
 .hero-card-preview {
-  background: white;
+  background: var(--bg-elevated);
   width: 100%;
   max-width: 380px;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xl);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--border-subtle);
   position: relative;
   z-index: 1;
   padding: 24px;
-  backdrop-filter: blur(10px);
-  transform: perspective(1000px) rotateY(-5deg) translateY(-10px);
-  transition: transform 0.5s ease;
+  backdrop-filter: blur(20px) saturate(180%);
+  transform: perspective(1000px) rotateY(-4deg) translateY(-8px);
+  transition: transform var(--transition-med), box-shadow var(--transition-med), border-color var(--transition-fast);
 }
 
 .hero-card-preview:hover {
-  transform: perspective(1000px) rotateY(0deg) translateY(-15px);
+  transform: perspective(1000px) rotateY(0deg) translateY(-12px);
+  border-color: var(--border-strong);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
 }
 
 .preview-header {
@@ -329,7 +364,7 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 .dot.green { background-color: #10B981; }
 
 .skeleton-line {
-  background: #F3F4F6;
+  background: var(--bg-elevated-2);
   height: 12px;
   border-radius: 6px;
   margin-bottom: 12px;
@@ -337,27 +372,21 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 .skeleton-line.long { width: 80%; }
 .skeleton-line.medium { width: 60%; margin-bottom: 24px; }
 
-.ai-badge-preview {
+.status-badge-preview {
   display: inline-flex;
   align-items: center;
-  background: rgba(16, 185, 129, 0.1);
-  color: #10B981;
+  background: rgba(48, 209, 88, 0.12);
+  color: #30d158;
   padding: 8px 16px;
   border-radius: var(--radius-md);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 14px;
+  border: 1px solid rgba(48, 209, 88, 0.25);
 }
 
 /* =========================================
    ЖАҢА ЕРЕКШЕЛІКТЕР SECTION (Шаг 1.1)
    ========================================= */
-
-:root {
-  /* Existing vars + new accent colors */
-  --accent-upload: #0081C9;
-  --accent-github: #2D3E50;
-  --accent-ai: #1DB954;
-}
 
 .features {
   padding: 80px 0 120px;
@@ -383,19 +412,18 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 
 /* Base style for all feature cards, adding a glide-in animation initial state */
 .feature-card {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-elevated);
   padding: 40px;
-  border-radius: 24px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(229, 231, 235, 0.5);
-  /* ПЛАВНОСТЬ: cubic-bezier делает анимацию "дорогой" */
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-subtle);
+  transition: transform var(--transition-med), box-shadow var(--transition-med), border-color var(--transition-fast), background-color var(--transition-fast);
   display: flex;
   flex-direction: column;
   align-items: start;
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(20px);
   
   /* Initial state for glide-in animation (requires JS trigger to look right) */
   /* opacity: 0; */
@@ -404,9 +432,9 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 
 /* --- HOVER INTERACTIONS (The visual update shown) --- */
 .feature-card:hover {
-  transform: translateY(-8px) scale(1.03); /* Lift up and scale slightly */
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border-color: var(--primary-color);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(41, 151, 255, 0.35);
 }
 
 /* Activate the glowing halo background on hover using BEFORE */
@@ -455,10 +483,10 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
   justify-content: center;
   width: 68px;
   height: 68px;
-  background: var(--bg-soft);
+  background: var(--bg-elevated-2);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  transition: all 0.3s ease;
+  border: 1px solid var(--border-subtle);
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 /* Apply specific accent borders and shadows on hover to icon wrappers */
@@ -473,6 +501,16 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 .feature-card:nth-child(3):hover .icon-wrapper {
   border: 1px solid rgba(29, 185, 84, 0.5);
   box-shadow: 0 0 10px rgba(29, 185, 84, 0.2);
+}
+
+.feature-card:nth-child(1) .icon-wrapper {
+  color: var(--primary-color);
+}
+.feature-card:nth-child(2) .icon-wrapper {
+  color: var(--text-muted);
+}
+.feature-card:nth-child(3) .icon-wrapper {
+  color: var(--accent-secondary);
 }
 
 .feature-card h3 {
@@ -499,26 +537,42 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
    ШАГ 2: АВТОРИЗАЦИЯ (Login & Register)
    ========================================= */
 
+.auth-error-banner {
+  background: rgba(255, 69, 58, 0.12);
+  border: 1px solid rgba(255, 69, 58, 0.35);
+  color: #ff453a;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  line-height: 1.45;
+  margin-bottom: 16px;
+}
+
 .auth-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--bg-soft);
-  background-image: radial-gradient(#D1D5DB 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-color: var(--bg-page);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
   padding: 20px;
 }
 
 .auth-card-modern {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  background: var(--bg-elevated);
+  backdrop-filter: blur(24px) saturate(180%);
   width: 100%;
   max-width: 420px;
   padding: 48px 40px;
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xl);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--border-subtle);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.auth-card-modern:hover {
+  border-color: var(--border-strong);
 }
 
 .auth-header {
@@ -529,13 +583,14 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 .auth-icon {
   width: 48px;
   height: 48px;
-  background: rgba(0, 86, 210, 0.1);
+  background: rgba(41, 151, 255, 0.12);
   color: var(--primary-color);
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px auto;
+  border: 1px solid var(--border-subtle);
 }
 
 .auth-header h2 {
@@ -597,27 +652,55 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 .input-icon {
   position: absolute;
   left: 14px;
-  color: #9CA3AF;
-  transition: color 0.3s ease;
+  color: var(--text-dim);
+  transition: color var(--transition-fast);
+  pointer-events: none;
 }
 
 .input-wrapper input {
   width: 100%;
-  padding: 14px 14px 14px 44px; /* Отступ слева для иконки */
+  padding: 14px 14px 14px 44px;
   font-size: 15px;
-  border: 1.5px solid #E5E7EB;
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  background-color: #F9FAFB;
+  background-color: var(--bg-elevated-2);
   color: var(--text-main);
-  transition: all 0.3s ease;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
   font-family: inherit;
+}
+
+.input-wrapper--password input {
+  padding-right: 48px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.password-toggle-btn:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .input-wrapper input:focus {
   outline: none;
   border-color: var(--primary-color);
-  background-color: #FFFFFF;
-  box-shadow: 0 0 0 4px rgba(0, 86, 210, 0.1);
+  background-color: var(--bg-elevated);
+  box-shadow: 0 0 0 3px rgba(41, 151, 255, 0.2);
 }
 
 /* Подсветка иконки при фокусе инпута */
@@ -678,21 +761,21 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
   width: 100%;
   padding: 14px 14px 14px 44px;
   font-size: 15px;
-  border: 1.5px solid #E5E7EB;
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  background-color: #F9FAFB;
+  background-color: var(--bg-elevated-2);
   color: var(--text-main);
-  transition: all 0.3s ease;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
   font-family: inherit;
-  appearance: none; /* Стандартты төмен түсетін стрелканы жасыру/өзгерту үшін */
+  appearance: none;
   cursor: pointer;
 }
 
 .modern-select:focus {
   outline: none;
   border-color: var(--primary-color);
-  background-color: #FFFFFF;
-  box-shadow: 0 0 0 4px rgba(0, 86, 210, 0.1);
+  background-color: var(--bg-elevated);
+  box-shadow: 0 0 0 3px rgba(41, 151, 255, 0.2);
 }
 
 /* =========================================
@@ -701,7 +784,7 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 
 .dashboard-page {
   padding: 40px 20px 80px 20px;
-  background-color: var(--bg-soft);
+  background-color: var(--bg-page);
   min-height: 100vh;
 }
 
@@ -736,22 +819,33 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: white;
+  background: var(--bg-elevated);
   padding: 10px 16px;
-  border-radius: 50px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid #E5E7EB;
+  border-radius: 100px;
+  border: 1px solid var(--border-subtle);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.user-badge:hover {
+  border-color: var(--border-strong);
 }
 
 .user-role-icon {
-  font-size: 24px;
-  background: var(--bg-soft);
+  font-size: 0;
+  background: var(--bg-elevated-2);
   width: 40px;
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+}
+
+.user-role-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--primary-color);
 }
 
 .user-info {
@@ -771,27 +865,38 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 
 /* Base Card Style */
 .dashboard-card {
-  background: white;
-  border-radius: 20px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-lg);
   padding: 32px;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-  border: 1px solid #E5E7EB;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-subtle);
   margin-bottom: 24px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.dashboard-card:hover {
+  border-color: var(--border-strong);
 }
 
 /* Upload Card Specifics */
 .upload-card .card-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   margin-bottom: 24px;
 }
 
 .upload-card .card-header h2 {
+  margin: 0;
   font-size: 20px;
   font-weight: 700;
   color: var(--text-main);
+}
+
+.dashboard-card .card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
 }
 
 .upload-form {
@@ -804,19 +909,19 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
   width: 100%;
   padding: 12px 16px;
   font-size: 15px;
-  border: 1px solid #D1D5DB;
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  background-color: #F9FAFB;
+  background-color: var(--bg-elevated-2);
   color: var(--text-main);
-  transition: all 0.2s ease;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
   font-family: inherit;
 }
 
 .modern-input:focus {
   outline: none;
   border-color: var(--primary-color);
-  background-color: white;
-  box-shadow: 0 0 0 3px rgba(0, 86, 210, 0.1);
+  background-color: var(--bg-elevated);
+  box-shadow: 0 0 0 3px rgba(41, 151, 255, 0.2);
 }
 
 /* Әдемі File Upload батырмасы */
@@ -826,19 +931,19 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
   justify-content: center;
   gap: 10px;
   padding: 20px;
-  border: 2px dashed #D1D5DB;
+  border: 1px dashed var(--border-strong);
   border-radius: var(--radius-md);
-  background-color: #F9FAFB;
+  background-color: var(--bg-elevated-2);
   cursor: pointer;
   color: var(--text-muted);
   font-weight: 500;
-  transition: all 0.2s;
+  transition: border-color var(--transition-fast), color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .file-upload-label:hover {
   border-color: var(--primary-color);
   color: var(--primary-color);
-  background-color: rgba(0, 86, 210, 0.02);
+  background-color: rgba(41, 151, 255, 0.06);
 }
 
 /* Projects List */
@@ -848,7 +953,7 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
   align-items: center;
   margin: 40px 0 20px 0;
   padding-bottom: 12px;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .projects-header h2 {
@@ -858,12 +963,13 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 }
 
 .projects-count {
-  background: #E5E7EB;
+  background: var(--bg-elevated-2);
   color: var(--text-muted);
   padding: 4px 12px;
-  border-radius: 20px;
+  border-radius: 100px;
   font-size: 13px;
   font-weight: 600;
+  border: 1px solid var(--border-subtle);
 }
 
 /* Project Card */
@@ -873,7 +979,7 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 
 .project-card:hover {
   box-shadow: var(--shadow-md);
-  border-color: #D1D5DB;
+  border-color: var(--border-strong);
 }
 
 .project-header {
@@ -900,9 +1006,9 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
   white-space: nowrap;
 }
 
-.status-accepted { background: #D1FAE5; color: #065F46; } /* Жасыл */
-.status-rejected { background: #FEE2E2; color: #991B1B; } /* Қызыл */
-.status-pending { background: #FEF3C7; color: #92400E; } /* Сары */
+.status-accepted { background: rgba(48, 209, 88, 0.15); color: #30d158; border: 1px solid rgba(48, 209, 88, 0.3); }
+.status-rejected { background: rgba(255, 69, 58, 0.12); color: #ff453a; border: 1px solid rgba(255, 69, 58, 0.28); }
+.status-pending { background: rgba(255, 214, 10, 0.12); color: #ffd60a; border: 1px solid rgba(255, 214, 10, 0.28); }
 
 .project-meta {
   display: flex;
@@ -931,9 +1037,10 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  background: var(--bg-soft);
-  border-radius: 8px;
+  background: var(--bg-elevated-2);
+  border-radius: var(--radius-sm);
   margin-bottom: 20px;
+  border: 1px solid var(--border-subtle);
 }
 
 .project-file a {
@@ -947,11 +1054,17 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 
 /* GitHub Box */
 .github-box {
-  background: #111827; /* Dark theme for github */
-  border-radius: 12px;
+  background: #0d0d0f;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
   padding: 16px;
-  color: white;
+  color: #f5f5f7;
   margin-bottom: 20px;
+  transition: border-color var(--transition-fast);
+}
+
+.github-box:hover {
+  border-color: var(--border-strong);
 }
 
 .github-box-header {
@@ -991,16 +1104,19 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 .btn-outline-small {
   padding: 8px 16px;
   background: transparent;
-  border: 1px solid #D1D5DB;
+  border: 1px solid var(--border-strong);
   color: var(--text-main);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 
-.btn-outline-small:hover { background: var(--bg-soft); }
+.btn-outline-small:hover {
+  background: var(--bg-elevated-2);
+  border-color: var(--text-muted);
+}
 
 .inline-form {
   display: flex;
@@ -1009,7 +1125,7 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 
 .divider {
   border: none;
-  border-top: 1px solid #E5E7EB;
+  border-top: 1px solid var(--border-subtle);
   margin: 24px 0;
 }
 
@@ -1018,10 +1134,10 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: #F9FAFB;
+  background: var(--bg-elevated-2);
   padding: 20px;
-  border-radius: 12px;
-  border: 1px solid #E5E7EB;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
   margin-bottom: 16px;
 }
 
@@ -1033,38 +1149,201 @@ h1, h2, h3, h4, h5, h6, .hero-title, .auth-title {
 
 .short-input { width: 140px; }
 
-/* AI Magic Button */
-.btn-ai {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, #6366F1, #8B5CF6);
-  color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
-}
-
-.btn-ai:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-}
-
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  background: white;
-  border-radius: 20px;
-  border: 1px dashed #D1D5DB;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--border-strong);
+  transition: border-color var(--transition-fast);
 }
 
-.empty-icon { font-size: 48px; margin-bottom: 16px; }
+.empty-state:hover {
+  border-color: rgba(41, 151, 255, 0.35);
+}
+
+.empty-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px auto;
+  opacity: 0.45;
+  color: var(--text-muted);
+}
+
+.empty-icon svg {
+  width: 100%;
+  height: 100%;
+}
 .empty-state h3 { font-size: 18px; color: var(--text-main); margin-bottom: 8px; }
 .empty-state p { color: var(--text-muted); font-size: 14px; }
+
+/* Shell & navigation (Apple-style bar) */
+.app-shell {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: var(--bg-page);
+}
+
+.app-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px max(24px, 4vw);
+  background: rgba(28, 28, 30, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+.app-navbar__logo {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--text-main);
+  text-decoration: none;
+  transition: opacity var(--transition-fast);
+}
+
+.app-navbar__logo:hover {
+  opacity: 0.75;
+}
+
+.app-navbar__nav {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.app-navbar__muted {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.app-navbar__link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 15px;
+  padding: 8px 12px;
+  border-radius: 100px;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.app-navbar__link:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.app-navbar__link--accent {
+  color: var(--primary-color);
+}
+
+.app-navbar__link--accent:hover {
+  color: var(--primary-hover);
+  background: rgba(41, 151, 255, 0.1);
+}
+
+.app-navbar__btn {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+  border: 1px solid var(--border-strong);
+  border-radius: 100px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  font-family: inherit;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.app-navbar__btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.app-navbar__cta {
+  padding: 8px 18px;
+  background: var(--primary-color);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: background-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.app-navbar__cta:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 4px 16px rgba(41, 151, 255, 0.35);
+}
+
+.card-header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated-2);
+  border: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.card-header-icon svg {
+  stroke: var(--primary-color);
+}
+
+.dashboard-inset {
+  background: var(--bg-elevated-2);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.dashboard-success-banner {
+  border-left: 3px solid #30d158 !important;
+  background: rgba(48, 209, 88, 0.08) !important;
+}
+
+.dashboard-success-banner p {
+  color: #a8e0b4 !important;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.admin-stat-card {
+  margin: 0;
+  padding: 22px;
+  text-align: center;
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.admin-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+}
+
+.admin-stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text-main);
+}
+
+.admin-stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin-top: 6px;
+}

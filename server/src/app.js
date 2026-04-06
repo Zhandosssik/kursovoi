@@ -2,7 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const projectRoutes = require('./routes/projectRoutes');
 const groupRoutes = require('./routes/groupRoutes');
-const assignmentRoutes = require('./routes/assignmentRoutes'); // Жаңа роут
+const assignmentRoutes = require('./routes/assignmentRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 require('dotenv').config();
 const { pool } = require('./config/db');
 
@@ -24,6 +25,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/assignments', assignmentRoutes);
+app.use('/api/admin', adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 

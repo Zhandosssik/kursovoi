@@ -1,7 +1,4 @@
 const { pool } = require('../config/db');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Жобаны жүктеу (Загрузка проекта студентом)
 const uploadProject = async (req, res) => {
@@ -87,48 +84,4 @@ const getProjects = async (req, res) => {
     }
 };
 
-// ЖАСАНДЫ ИНТЕЛЛЕКТ АРҚЫЛЫ АВТО-БАҒАЛАУ
-const generateAIReview = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const projectQuery = await pool.query(`
-            SELECT p.title, p.description, g.repo_url, g.language
-            FROM projects p
-            LEFT JOIN github_links g ON p.id = g.project_id
-            WHERE p.id = $1
-        `, [id]);
-
-        if (projectQuery.rows.length === 0) {
-            return res.status(404).json({ message: 'Жоба табылмады' });
-        }
-        const project = projectQuery.rows[0];
-
-        const prompt = `
-        Сен университет оқытушысының көмекшісісің. Мына курстық жұмысты бағалауға көмектес:
-        Тақырыбы: "${project.title}"
-        Сипаттамасы: "${project.description}"
-        ${project.repo_url ? `GitHub сілтемесі: ${project.repo_url} (Тілі: ${project.language})` : 'GitHub сілтемесі жоқ.'}
-
-        Маған тек қана JSON форматында жауап бер. Басқа ешқандай сөз қоспа:
-        {
-            "feedback": "Студентке арналған қазақ тіліндегі конструктивті пікір (2-3 сөйлем. Несі жақсы, нені толықтыру керек).",
-            "suggested_grade": "Осы сипаттамаға қарап ұсынылатын баға (0-ден 100-ге дейін сан, тырнақшасыз)"
-        }
-        `;
-
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const result = await model.generateContent(prompt);
-        const text = result.response.text();
-
-        const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        const aiData = JSON.parse(cleanText);
-
-        res.status(200).json(aiData);
-    } catch (error) {
-        console.error('AI қатесі:', error);
-        res.status(500).json({ message: 'Жасанды интеллектпен байланыс қатесі' });
-    }
-};
-
-module.exports = { uploadProject, getProjects, generateAIReview };
+module.exports = { uploadProject, getProjects };

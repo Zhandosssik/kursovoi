@@ -11,7 +11,7 @@ import AdminPanel from './pages/AdminPanel';
 function App() {
   return (
     <Router>
-      <div style={{ margin: 0, padding: 0, backgroundColor: '#F8F9FA', minHeight: '100vh' }}>
+      <div className="app-shell">
         <Navbar />
         
         {/* Барлық парақшалар осы жерде ашылады */}
@@ -35,7 +35,7 @@ function App() {
             <Route 
               path="/admin" 
               element={
-                <ProtectedRoute>
+                <ProtectedRoute adminOnly>
                   <AdminPanel />
                 </ProtectedRoute>
               } 

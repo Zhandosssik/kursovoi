@@ -46,6 +46,8 @@ const getAssignments = async (req, res) => {
                 WHERE a.group_id = $1 AND (a.student_ids IS NULL OR $2 = ANY(a.student_ids))
                 ORDER BY a.deadline ASC
             `, [groupId, id]);
+        } else {
+            assignments = { rows: [] };
         }
 
         res.json(assignments.rows);

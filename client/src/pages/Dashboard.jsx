@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
+import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -45,8 +46,29 @@ function Dashboard() {
     };
 
     useEffect(() => {
+        if (!user || user.role === 'admin') return;
         fetchData();
-    }, []);
+    }, [user]);
+
+    const openAssignments = useMemo(() => {
+        if (user?.role !== 'student') return [];
+        return assignments.filter(
+            (a) =>
+                !projects.some(
+                    (p) =>
+                        p.assignment_id != null &&
+                        Number(p.assignment_id) === Number(a.id)
+                )
+        );
+    }, [user?.role, assignments, projects]);
+
+    useEffect(() => {
+        if (!selectedAssignment) return;
+        const stillOpen = openAssignments.some(
+            (a) => String(a.id) === String(selectedAssignment)
+        );
+        if (!stillOpen) setSelectedAssignment('');
+    }, [openAssignments, selectedAssignment]);
 
     // 1. Мұғалім - Тапсырма жасау
     const handleCreateAssignment = async (e) => {
@@ -131,6 +153,10 @@ function Dashboard() {
 
     if (!user) return <div style={{ padding: '40px', textAlign: 'center' }}>Жүйеге кіріңіз...</div>;
 
+    if (user.role === 'admin') {
+        return <Navigate to="/admin" replace />;
+    }
+
     return (
         <div className="dashboard-page">
             <div className="dashboard-container">
@@ -142,8 +168,20 @@ function Dashboard() {
                         <p className="dashboard-subtitle">Қош келдіңіз, жұмысыңызды басқарыңыз</p>
                     </div>
                     <div className="user-badge">
-                        <div className="user-role-icon">
-                            {user.role === 'teacher' ? '👨‍🏫' : '🎓'}
+                        <div className="user-role-icon" aria-hidden>
+                            {user.role === 'teacher' ? (
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                </svg>
+                            ) : (
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                                </svg>
+                            )}
                         </div>
                         <div className="user-info">
                             <strong>{user.firstName} {user.lastName}</strong>
@@ -157,7 +195,14 @@ function Dashboard() {
                 {user.role === 'teacher' && (
                     <div className="dashboard-card upload-card fade-in-up" style={{ animationDelay: '0.1s' }}>
                         <div className="card-header">
-                            <div className="icon-wrapper" style={{ margin: 0, width: '48px', height: '48px' }}>📝</div>
+                            <div className="card-header-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="12" y1="18" x2="12" y2="12" />
+                                    <line x1="9" y1="15" x2="15" y2="15" />
+                                </svg>
+                            </div>
                             <h2>Жаңа тапсырма беру</h2>
                         </div>
                         <form onSubmit={handleCreateAssignment} className="upload-form">
@@ -174,13 +219,12 @@ function Dashboard() {
 
                                 {/* 2. СТУДЕНТТЕРДІ ГАЛОЧКАМЕН ТАҢДАУ (CHECKBOXES) */}
                                 {newAssignment.group_id && (
-                                    <div style={{ background: '#F9FAFB', padding: '16px', borderRadius: '12px', border: '1px solid #E5E7EB' }}>
-                                        <label style={{ fontWeight: '600', marginBottom: '12px', display: 'block', fontSize: '14px' }}>
+                                    <div className="dashboard-inset">
+                                        <label style={{ fontWeight: '600', marginBottom: '12px', display: 'block', fontSize: '14px', color: 'var(--text-main)' }}>
                                             Кімдерге тапсырма береміз?
                                         </label>
                                         
-                                        {/* Бүкіл топқа батырмасы */}
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid #E5E7EB' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid var(--border-subtle)' }}>
                                             <input 
                                                 type="checkbox" 
                                                 id="all_students"
@@ -188,7 +232,7 @@ function Dashboard() {
                                                 checked={newAssignment.student_ids.length === 0} 
                                                 onChange={() => setNewAssignment({...newAssignment, student_ids: []})}
                                             />
-                                            <label htmlFor="all_students" style={{ cursor: 'pointer', fontWeight: '500' }}>👥 Бүкіл топқа (Барлығына)</label>
+                                            <label htmlFor="all_students" style={{ cursor: 'pointer', fontWeight: '500' }}>Бүкіл топқа</label>
                                         </div>
 
                                         {/* Оқушылар тізімі (екі баған етіп шығарамыз) */}
@@ -217,7 +261,7 @@ function Dashboard() {
                                                         }}
                                                     />
                                                     <label htmlFor={`student_${student.id}`} style={{ cursor: 'pointer', fontSize: '14px' }}>
-                                                        👤 {student.first_name} {student.last_name}
+                                                        {student.first_name} {student.last_name}
                                                     </label>
                                                 </div>
                                             ))}
@@ -240,23 +284,23 @@ function Dashboard() {
                     </div>
                 )}
 
-                {/* БЛОК ДЛЯ СТУДЕНТА: ОРЫНДАЛУЫ ТИІС ТАПСЫРМАЛАР */}
-                {user.role === 'student' && assignments.length > 0 && (
-                    <div className="dashboard-card fade-in-up" style={{ animationDelay: '0.1s', borderLeft: '4px solid var(--ai-accent)' }}>
+                {/* БЛОК ДЛЯ СТУДЕНТА: ОРЫНДАЛУЫ ТИІС ТАПСЫРМАЛАР (жүктелгендері тізімнен алынады) */}
+                {user.role === 'student' && openAssignments.length > 0 && (
+                    <div className="dashboard-card fade-in-up" style={{ animationDelay: '0.1s', borderLeft: '4px solid var(--primary-color)' }}>
                         <div className="card-header" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
                             <h2 style={{ fontSize: '20px', margin: 0 }}>Орындалуы тиіс тапсырмалар</h2>
-                            <span className="projects-count">{assignments.length}</span>
+                            <span className="projects-count">{openAssignments.length}</span>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                            {assignments.map(task => (
-                                <div key={task.id} style={{ padding: '16px', background: 'var(--bg-soft)', borderRadius: '12px', border: '1px solid #E5E7EB' }}>
+                            {openAssignments.map(task => (
+                                <div key={task.id} className="dashboard-inset">
                                     <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', color: 'var(--text-main)' }}>{task.title}</h3>
                                     <p style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--text-muted)' }}>{task.description}</p>
-                                    <div style={{ display: 'flex', gap: '16px', fontSize: '13px', fontWeight: '600' }}>
-                                        <span style={{ color: '#EF4444', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                            ⏱ Дедлайн: {formatDeadline(task.deadline)}
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', fontSize: '13px', fontWeight: '600' }}>
+                                        <span style={{ color: '#ff9f0a' }}>
+                                            Мерзімі: {formatDeadline(task.deadline)}
                                         </span>
-                                        <span style={{ color: 'var(--primary-color)' }}>👨‍🏫 Оқытушы: {task.teacher_name}</span>
+                                        <span style={{ color: 'var(--primary-color)' }}>Оқытушы: {task.teacher_name}</span>
                                     </div>
                                 </div>
                             ))}
@@ -264,11 +308,25 @@ function Dashboard() {
                     </div>
                 )}
 
+                {user.role === 'student' && assignments.length > 0 && openAssignments.length === 0 && (
+                    <div className="dashboard-card dashboard-success-banner fade-in-up" style={{ animationDelay: '0.1s' }}>
+                        <p>
+                            Барлық мұғалім тапсырмаларына жұмыс жіберілді. Жаңа тапсырма келсе, ол осы жерде көрінеді.
+                        </p>
+                    </div>
+                )}
+
                 {/* БЛОК ДЛЯ СТУДЕНТА: ЖҰМЫСТЫ ЖҮКТЕУ */}
                 {user.role === 'student' && (
                     <div className="dashboard-card upload-card fade-in-up" style={{ animationDelay: '0.2s' }}>
                         <div className="card-header">
-                            <div className="icon-wrapper" style={{ margin: 0, width: '48px', height: '48px' }}>📤</div>
+                            <div className="card-header-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                            </div>
                             <h2>Жұмысты жүктеу (Жауап беру)</h2>
                         </div>
                         <form onSubmit={handleUpload} className="upload-form">
@@ -280,9 +338,9 @@ function Dashboard() {
                                 onChange={(e) => setSelectedAssignment(e.target.value)}
                             >
                                 <option value="">Өздігінен еркін жұмыс жүктеу (Тапсырмасыз)</option>
-                                {assignments.map(task => (
+                                {openAssignments.map(task => (
                                     <option key={task.id} value={task.id}>
-                                        📌 {task.title} (Мұғалім: {task.teacher_name})
+                                        {task.title} — {task.teacher_name}
                                     </option>
                                 ))}
                             </select>
@@ -301,7 +359,7 @@ function Dashboard() {
                             </label>
                             
                             <button type="submit" className="btn-primary" style={{ padding: '14px', fontSize: '16px' }} disabled={uploading}>
-                                {uploading ? 'Жүктелуде... ⏳' : '✨ Жұмысты жіберу'}
+                                {uploading ? 'Жүктелуде…' : 'Жұмысты жіберу'}
                             </button>
                         </form>
                     </div>
@@ -315,7 +373,11 @@ function Dashboard() {
 
                 {projects.length === 0 ? (
                     <div className="empty-state fade-in-up" style={{ animationDelay: '0.4s' }}>
-                        <div className="empty-icon">📂</div>
+                        <div className="empty-icon" aria-hidden>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                            </svg>
+                        </div>
                         <h3>Әзірге ешқандай жұмыс жоқ</h3>
                         <p>Бірінші болып жобаңызды жүктеңіз!</p>
                     </div>
@@ -326,13 +388,13 @@ function Dashboard() {
                                 <div className="project-header">
                                     <h3 className="project-title">{proj.title}</h3>
                                     <span className={`status-badge status-${proj.status}`}>
-                                        {proj.status === 'accepted' ? 'Қабылданды ✅' : proj.status === 'rejected' ? 'Қайтарылды ❌' : 'Тексерілуде ⏳'}
+                                        {proj.status === 'accepted' ? 'Қабылданды' : proj.status === 'rejected' ? 'Қайтарылды' : 'Тексерілуде'}
                                     </span>
                                 </div>
                                 
                                 <div className="project-meta">
                                     <div className="project-author">
-                                        👤 {proj.first_name} {proj.last_name}
+                                        {proj.first_name} {proj.last_name}
                                     </div>
                                 </div>
 
@@ -340,8 +402,8 @@ function Dashboard() {
                                 
                                 {proj.file_url && (
                                     <div className="project-file">
-                                        📄 <a href={`http://localhost:5000${proj.file_url}`} target="_blank" rel="noreferrer">
-                                            Құжатты жүктеп алу / Көру
+                                        <a href={`http://localhost:5000${proj.file_url}`} target="_blank" rel="noreferrer">
+                                            Құжатты ашу
                                         </a>
                                     </div>
                                 )}
@@ -358,7 +420,7 @@ function Dashboard() {
                                         </div>
                                         <div className="github-meta">
                                             <span><span className="lang-dot"></span>{proj.language || 'Белгісіз'}</span>
-                                            <span>⭐ {proj.stars_count || 0}</span>
+                                            <span>Жұлдыз: {proj.stars_count || 0}</span>
                                         </div>
                                     </div>
                                 ) : (
@@ -391,8 +453,8 @@ function Dashboard() {
                                                     <div className="review-controls">
                                                         <input className="modern-input short-input" type="number" placeholder="Баға (0-100)" value={gradeData.grade} onChange={(e) => setGradeData({...gradeData, grade: e.target.value})} />
                                                         <select className="modern-input short-input" value={gradeData.status} onChange={(e) => setGradeData({...gradeData, status: e.target.value})}>
-                                                            <option value="accepted">Қабылдау ✅</option>
-                                                            <option value="rejected">Қайтару ❌</option>
+                                                            <option value="accepted">Қабылдау</option>
+                                                            <option value="rejected">Қайтару</option>
                                                         </select>
                                                         <button className="btn-primary" style={{ padding: '0 24px', borderRadius: '8px' }} onClick={() => handleReview(proj.id)}>Сақтау</button>
                                                         <button className="btn-outline-small" onClick={() => setActiveProject(null)}>Болдырмау</button>
@@ -400,7 +462,7 @@ function Dashboard() {
                                                 </div>
                                             ) : (
                                                 <button className="btn-outline-small" onClick={() => setActiveProject(proj.id)}>
-                                                    ✍️ Тексеру және Бағалау
+                                                    Тексеру және бағалау
                                                 </button>
                                             )}
                                         </div>

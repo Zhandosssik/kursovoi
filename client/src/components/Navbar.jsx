@@ -8,69 +8,46 @@ function Navbar() {
 
     const handleLogout = () => {
         logout();
-        navigate('/'); // Шыққан соң Басты бетке жібереміз
+        navigate('/');
     };
 
+    const displayName = user?.firstName || user?.first_name || '';
+    const roleLabel =
+        user?.role === 'teacher' ? 'Оқытушы' : user?.role === 'admin' ? 'Әкімші' : 'Студент';
+
     return (
-        <nav style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            padding: '15px 40px', 
-            backgroundColor: '#FFFFFF', 
-            borderBottom: '1px solid #E5E7EB',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
-        }}>
-            <div>
-                <Link to="/" style={{ color: '#0056D2', textDecoration: 'none', fontSize: '22px', fontWeight: 'bold' }}>
-                    🎓 UniPortal
-                </Link>
-            </div>
-            
-            <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+        <nav className="app-navbar">
+            <Link to="/" className="app-navbar__logo">
+                UniPortal
+            </Link>
+
+            <div className="app-navbar__nav">
                 {user ? (
                     <>
-                        <span style={{ color: '#4B5563', fontWeight: '500', fontSize: '15px' }}>
-                            Сәлем, {user.first_name}! ({user.role === 'teacher' ? 'Оқытушы' : user.role === 'admin' ? 'Админ' : 'Студент'})
+                        <span className="app-navbar__muted">
+                            {displayName} · {roleLabel}
                         </span>
-                        
-                        <Link to="/dashboard" style={{ color: '#374151', textDecoration: 'none', fontWeight: '500' }}>
-                            Бақылау тақтасы
-                        </Link>
 
-                        {user.role === 'admin' && (
-                            <Link to="/admin" style={{ color: '#0056D2', textDecoration: 'none', fontWeight: '600' }}>
-                                Админ Панель
+                        {user.role === 'admin' ? (
+                            <Link to="/admin" className="app-navbar__link app-navbar__link--accent">
+                                Әкімшілік
+                            </Link>
+                        ) : (
+                            <Link to="/dashboard" className="app-navbar__link">
+                                Тақта
                             </Link>
                         )}
-                        
-                        <button 
-                            onClick={handleLogout} 
-                            style={{ 
-                                padding: '8px 16px', 
-                                backgroundColor: '#F3F4F6', 
-                                color: '#374151', 
-                                border: '1px solid #D1D5DB', 
-                                borderRadius: '6px', 
-                                cursor: 'pointer',
-                                fontWeight: '500',
-                                transition: '0.2s'
-                            }}
-                        >
+
+                        <button type="button" className="app-navbar__btn" onClick={handleLogout}>
                             Шығу
                         </button>
                     </>
                 ) : (
                     <>
-                        <Link to="/login" style={{ color: '#374151', textDecoration: 'none', fontWeight: '500' }}>Кіру</Link>
-                        <Link to="/register" style={{ 
-                            padding: '8px 16px', 
-                            backgroundColor: '#0056D2', 
-                            color: 'white', 
-                            textDecoration: 'none', 
-                            borderRadius: '6px',
-                            fontWeight: '500'
-                        }}>
+                        <Link to="/login" className="app-navbar__link">
+                            Кіру
+                        </Link>
+                        <Link to="/register" className="app-navbar__cta">
                             Тіркелу
                         </Link>
                     </>
