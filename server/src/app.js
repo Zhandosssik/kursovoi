@@ -29,6 +29,6 @@ app.use('/api/admin', adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Сервер http://localhost:${PORT} мекенжайында іске қосылды`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Сервер http://0.0.0.0:${PORT} мекенжайында іске қосылды`);
 });

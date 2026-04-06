@@ -8,7 +8,7 @@ const uploadProject = async (req, res) => {
         const { title, description, assignment_id } = req.body;
         const studentId = req.user.id;
 
-        if (!req.file) {
+        if (!req.files || req.files.length === 0) {
             return res.status(400).json({ message: 'Файл таңдалмады!' });
         }
 
@@ -24,13 +24,16 @@ const uploadProject = async (req, res) => {
         );
         const projectId = projectResult.rows[0].id;
 
-        const fileUrl = `/uploads/${req.file.filename}`;
-        const fileType = req.file.mimetype === 'application/pdf' ? 'pdf' : 'docx';
+        for (const file of req.files) {
+            const fileUrl = `/uploads/${file.filename}`;
+            const fileExt = file.originalname.split('.').pop().toLowerCase();
+            const fileType = fileExt; // 'pdf', 'jpg', 'zip' etc.
 
-        await client.query(
-            'INSERT INTO files (project_id, file_url, file_type) VALUES ($1, $2, $3)',
-            [projectId, fileUrl, fileType]
-        );
+            await client.query(
+                'INSERT INTO files (project_id, file_url, file_type) VALUES ($1, $2, $3)',
+                [projectId, fileUrl, fileType]
+            );
+        }
 
         await client.query('COMMIT');
         res.status(201).json({ message: 'Жоба сәтті жүктелді!', projectId });
@@ -54,12 +57,16 @@ const getProjects = async (req, res) => {
         let query = `
             SELECT p.id, p.title, p.description, p.status, p.created_at, p.assignment_id,
                    u.first_name, u.last_name, u.group_id,
-                   f.file_url, f.file_type,
+                   (
+                       SELECT json_agg(json_build_object('file_url', f.file_url, 'file_type', f.file_type))
+                       FROM files f WHERE f.project_id = p.id
+                   ) as files_list,
                    g.repo_url, g.repo_name, g.language, g.stars_count,
-                   a.title as assignment_title
+                   a.title as assignment_title, a.type as assignment_type,
+                   (SELECT grade FROM comments WHERE project_id = p.id LIMIT 1) as grade,
+                   (SELECT text FROM comments WHERE project_id = p.id LIMIT 1) as comment_text
             FROM projects p
             JOIN users u ON p.student_id = u.id
-            LEFT JOIN files f ON p.id = f.project_id
             LEFT JOIN github_links g ON p.id = g.project_id
             LEFT JOIN assignments a ON p.assignment_id = a.id
         `;

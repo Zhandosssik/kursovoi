@@ -9,7 +9,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/uploadMiddleware');
 
 router.get('/', authMiddleware, getProjects);
-router.post('/', authMiddleware, upload.single('document'), uploadProject);
+router.post('/', authMiddleware, upload.array('documents', 10), uploadProject);
 router.post('/:projectId/github', authMiddleware, addGithubLink);
 router.put('/:projectId/review', authMiddleware, reviewProject);
 

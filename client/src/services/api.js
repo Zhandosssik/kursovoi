@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Негізгі API баптаулары (Базовая настройка)
 const api = axios.create({
-    baseURL: 'http://localhost:5000/api', // Бэкенд сервердің мекенжайы
+    baseURL: `http://${window.location.hostname}:5000/api`, // Серверге қатынау
 });
 
 // Әрбір сұраныс алдында токенді қосу (Интерцептор для добавления токена)

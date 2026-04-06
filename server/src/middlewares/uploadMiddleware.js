@@ -13,13 +13,15 @@ const storage = multer.diskStorage({
     }
 });
 
-// Тек PDF және DOCX рұқсат (Фильтр форматов)
+// Рұқсат етілген форматтар (Фильтр форматов)
 const fileFilter = (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    if (ext === '.pdf' || ext === '.docx' || ext === '.doc') {
+    const allowed = ['.pdf', '.docx', '.doc', '.zip', '.rar', '.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    
+    if (allowed.includes(ext)) {
         cb(null, true);
     } else {
-        cb(new Error('Тек PDF немесе DOCX файлдарын жүктеуге болады!'), false);
+        cb(new Error('Рұқсат етілмеген формат! Тек құжаттар, архивтер немесе суреттерді жүктеңіз.'), false);
     }
 };
 

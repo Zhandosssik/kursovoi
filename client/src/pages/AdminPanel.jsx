@@ -50,6 +50,8 @@ function AdminPanel() {
 
     return (
         <div className="dashboard-page">
+            <div className="bg-orbs" aria-hidden="true"></div>
+            <div className="bg-orb-center" aria-hidden="true"></div>
             <div className="dashboard-container">
                 <div className="dashboard-header fade-in-up">
                     <div>
