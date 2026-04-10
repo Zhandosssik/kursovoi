@@ -9,6 +9,7 @@ function AdminPanel() {
     const [teachers, setTeachers] = useState([]);
     const [stats, setStats] = useState(null);
     const [loadError, setLoadError] = useState('');
+    const [newGroupName, setNewGroupName] = useState('');
 
     const fetchData = async () => {
         setLoadError('');
@@ -37,6 +38,20 @@ function AdminPanel() {
             await fetchData();
         } catch (error) {
             alert('Қате: ' + (error.response?.data?.message || error.message));
+        }
+    };
+
+    const handleAddGroup = async (e) => {
+        e.preventDefault();
+        if (!newGroupName.trim()) return;
+        
+        try {
+            await api.post('/groups', { name: newGroupName });
+            alert('Топ сәтті қосылды!');
+            setNewGroupName('');
+            await fetchData(); // Тізімді жаңарту
+        } catch (error) {
+            alert('Топ қосу қатесі: ' + (error.response?.data?.message || error.message));
         }
     };
 
@@ -126,6 +141,22 @@ function AdminPanel() {
                         <li>Әр топқа кураторлық ететін оқытушыны таңдау немесе босату</li>
                         <li>Жүйедегі қолданушылар мен жобалардың санын бақылау</li>
                     </ul>
+                </div>
+
+                <div className="dashboard-card fade-in-up" style={{ animationDelay: '0.1s', marginBottom: '24px' }}>
+                    <h2 style={{ fontSize: '18px', marginBottom: '16px' }}>Жаңа топ қосу</h2>
+                    <form onSubmit={handleAddGroup} style={{ display: 'flex', gap: '10px' }}>
+                        <input
+                            type="text"
+                            placeholder="Мысалы: IT-21"
+                            className="modern-input"
+                            value={newGroupName}
+                            onChange={(e) => setNewGroupName(e.target.value)}
+                            style={{ flex: 1 }}
+                            required
+                        />
+                        <button type="submit" className="btn-primary">Қосу</button>
+                    </form>
                 </div>
 
                 <div className="projects-header fade-in-up" style={{ animationDelay: '0.1s' }}>

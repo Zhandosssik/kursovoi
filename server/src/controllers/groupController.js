@@ -46,4 +46,24 @@ const assignTeacher = async (req, res) => {
     }
 };
 
-module.exports = { getGroups, getTeachers, assignTeacher };
+// ЖАҢА: Топ қосу
+const createGroup = async (req, res) => {
+    try {
+        const { name } = req.body;
+        if (!name) return res.status(400).json({ message: 'Топтың атауын енгізіңіз' });
+        
+        // Осындай топ бар ма тексеру
+        const check = await pool.query('SELECT * FROM groups WHERE name = $1', [name]);
+        if (check.rows.length > 0) {
+            return res.status(400).json({ message: 'Бұл топ жүйеде бұрыннан бар' });
+        }
+
+        const result = await pool.query('INSERT INTO groups (name) VALUES ($1) RETURNING *', [name]);
+        res.status(201).json({ message: 'Топ сәтті қосылды', group: result.rows[0] });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Топ қосу кезінде қате шықты' });
+    }
+};
+
+module.exports = { getGroups, getTeachers, assignTeacher, createGroup };

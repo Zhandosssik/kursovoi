@@ -26,6 +26,7 @@ function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [isResetMode, setIsResetMode] = useState(false);
 
     const { login, user } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -52,6 +53,20 @@ function Login() {
                 (err.code === 'ERR_NETWORK' ? 'Серверге қосылу мүмкін емес.' : null) ||
                 'Кіру сәтсіз аяқталды. Әрекетті қайталаңыз.';
             setError(msg);
+        }
+    };
+
+    const handleResetSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        try {
+            const response = await api.post('/auth/reset-password', { email, newPassword: password });
+            alert(response.data.message);
+            setIsResetMode(false);
+            setPassword('');
+        } catch (err) {
+            console.error(err);
+            setError(err.response?.data?.message || 'Қате шықты. Әрекетті қайталаңыз.');
         }
     };
 
@@ -157,11 +172,11 @@ function Login() {
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                             </svg>
                         </div>
-                        <h2>Жүйеге кіру</h2>
-                        <p>Жалғастыру үшін мәліметтеріңізді енгізіңіз.</p>
+                        <h2>{isResetMode ? 'Құпия сөзді жаңарту' : 'Жүйеге кіру'}</h2>
+                        <p>{isResetMode ? 'Поштаңызды және жаңа құпия сөзді енгізіңіз.' : 'Жалғастыру үшін мәліметтеріңізді енгізіңіз.'}</p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="auth-form">
+                    <form onSubmit={isResetMode ? handleResetSubmit : handleSubmit} className="auth-form">
                         {error ? (
                             <div className="auth-error-banner" role="alert">
                                 {error}
@@ -186,10 +201,12 @@ function Login() {
 
                         <div className="form-group-modern">
                             <div className="label-row">
-                                <label>Құпия сөз</label>
-                                <a href="#" className="forgot-password" onClick={(e) => e.preventDefault()}>
-                                    Ұмыттыңыз ба?
-                                </a>
+                                <label>{isResetMode ? 'Жаңа құпия сөз' : 'Құпия сөз'}</label>
+                                {!isResetMode && (
+                                    <a href="#" className="forgot-password" onClick={(e) => { e.preventDefault(); setIsResetMode(true); setError(''); }}>
+                                        Ұмыттыңыз ба?
+                                    </a>
+                                )}
                             </div>
                             <div className="input-wrapper input-wrapper--password">
                                 <svg className="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -202,7 +219,7 @@ function Login() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
-                                    autoComplete="current-password"
+                                    autoComplete={isResetMode ? "new-password" : "current-password"}
                                 />
                                 <button
                                     type="button"
@@ -216,16 +233,23 @@ function Login() {
                         </div>
 
                         <button type="submit" className="btn-primary btn-full">
-                            Кіру
+                            {isResetMode ? 'Қалпына келтіру' : 'Кіру'}
                         </button>
+                        {isResetMode && (
+                            <button type="button" className="btn-secondary btn-full" style={{ marginTop: '10px' }} onClick={() => { setIsResetMode(false); setError(''); setPassword(''); }}>
+                                Кері қайту
+                            </button>
+                        )}
                     </form>
 
-                    <div className="auth-footer">
-                        <span>Аккаунтыңыз жоқ па?</span>
-                        <Link to="/register" className="auth-link-modern">
-                            Тіркелу
-                        </Link>
-                    </div>
+                    {!isResetMode && (
+                        <div className="auth-footer">
+                            <span>Аккаунтыңыз жоқ па?</span>
+                            <Link to="/register" className="auth-link-modern">
+                                Тіркелу
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

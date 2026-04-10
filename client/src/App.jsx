@@ -13,31 +13,31 @@ function App() {
     <Router>
       <div className="app-shell">
         <Navbar />
-        
-        {/* Барлық парақшалар осы жерде ашылады */}
+
+        { }
         <Routes>
-          {/* Енді жүйеге кіргенде бірінші Home ашылады */}
-          <Route path="/" element={<Home />} /> 
-          
+          { }
+          <Route path="/" element={<Home />} />
+
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          
-          <Route 
-            path="/dashboard" 
+
+          <Route
+            path="/dashboard"
             element={
               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
-            } 
+            }
           />
-          
-          <Route 
-            path="/admin" 
+
+          <Route
+            path="/admin"
             element={
               <ProtectedRoute adminOnly>
                 <AdminPanel />
               </ProtectedRoute>
-            } 
+            }
           />
         </Routes>
       </div>

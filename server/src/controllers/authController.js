@@ -109,5 +109,30 @@ const getPublicGroups = async (req, res) => {
     }
 };
 
+// Құпия сөзді қалпына келтіру
+const resetPassword = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+        
+        // 1. Пошта бойынша қолданушыны табу
+        const userQuery = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (userQuery.rows.length === 0) {
+            return res.status(404).json({ message: 'Мұндай пошта жүйеде тіркелмеген' });
+        }
 
-module.exports = { register, login, getPublicGroups };
+        // 2. Жаңа құпия сөзді хэштеу
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(newPassword, salt);
+
+        // 3. Құпия сөзді жаңарту
+        await pool.query('UPDATE users SET password_hash = $1 WHERE email = $2', [passwordHash, email]);
+
+        res.status(200).json({ message: 'Құпия сөз сәтті жаңартылды!' });
+    } catch (error) {
+        console.error("Құпия сөзді жаңарту қатесі:", error.message);
+        res.status(500).json({ message: 'Серверде қате шықты' });
+    }
+};
+
+
+module.exports = { register, login, getPublicGroups, resetPassword };

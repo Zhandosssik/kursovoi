@@ -27,6 +27,7 @@ function Register() {
     });
     const [groups, setGroups] = useState([]);
     const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const { user } = useContext(AuthContext);
@@ -47,12 +48,27 @@ function Register() {
         fetchGroups();
     }, []);
 
+    const validatePassword = (pwd) => {
+        if (pwd.length < 8) return 'Құпия сөз кемінде 8 таңбадан тұруы керек.';
+        if (!/[A-Z]/.test(pwd)) return 'Құпия сөзде кемінде бір бас әріп (A-Z) болуы керек.';
+        if (!/[a-zA-Z]/.test(pwd)) return 'Құпия сөзде кемінде бір ағылшын әрпі болуы керек.';
+        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(pwd)) return 'Құпия сөзде кемінде бір арнайы символ болуы керек.';
+        return null;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+        setError('');
+
+        const pwdError = validatePassword(formData.password);
+        if (pwdError) {
+            setError(pwdError);
+            return;
+        }
+
         const dataToSend = {
-            first_name: formData.firstName,  
-            last_name: formData.lastName,    
+            first_name: formData.firstName,
+            last_name: formData.lastName,
             email: formData.email,
             password: formData.password,
             role: formData.role,
@@ -66,7 +82,7 @@ function Register() {
         } catch (error) {
             console.error("Серверден келген жауап:", error.response?.data);
             const errorMsg = error.response?.data?.message || 'Сервер қатесі';
-            alert('Қате: ' + errorMsg);
+            setError(errorMsg);
         }
     };
 
@@ -81,15 +97,15 @@ function Register() {
                         <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
                             <defs>
                                 <linearGradient id="logoGrad2" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-                                    <stop offset="0%" stopColor="#2997ff"/>
-                                    <stop offset="100%" stopColor="#5e5ce6"/>
+                                    <stop offset="0%" stopColor="#2997ff" />
+                                    <stop offset="100%" stopColor="#5e5ce6" />
                                 </linearGradient>
                             </defs>
-                            <path d="M24 4L44 14V26C44 35.4 35.2 43.6 24 46C12.8 43.6 4 35.4 4 26V14L24 4Z" fill="url(#logoGrad2)" opacity="0.2"/>
-                            <path d="M24 4L44 14V26C44 35.4 35.2 43.6 24 46C12.8 43.6 4 35.4 4 26V14L24 4Z" stroke="url(#logoGrad2)" strokeWidth="2" fill="none"/>
-                            <path d="M14 22L24 28L34 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M24 14L34 20V28" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M14 20V28" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M24 4L44 14V26C44 35.4 35.2 43.6 24 46C12.8 43.6 4 35.4 4 26V14L24 4Z" fill="url(#logoGrad2)" opacity="0.2" />
+                            <path d="M24 4L44 14V26C44 35.4 35.2 43.6 24 46C12.8 43.6 4 35.4 4 26V14L24 4Z" stroke="url(#logoGrad2)" strokeWidth="2" fill="none" />
+                            <path d="M14 22L24 28L34 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M24 14L34 20V28" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M14 20V28" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     </div>
                     <span className="auth-brand__name">UniPortal</span>
@@ -97,7 +113,7 @@ function Register() {
 
                 <div className="auth-split-hero">
                     <h1 className="auth-split-hero__title">
-                        Академиялық<br/>
+                        Академиялық<br />
                         <span>мүмкіндіктер</span>
                     </h1>
                     <p className="auth-split-hero__sub">
@@ -157,19 +173,24 @@ function Register() {
                     </div>
 
                     <form onSubmit={handleSubmit} className="auth-form">
+                        {error && (
+                            <div className="auth-error-banner" role="alert" style={{ marginBottom: '16px' }}>
+                                {error}
+                            </div>
+                        )}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                             <div className="form-group-modern">
                                 <label>Аты</label>
                                 <div className="input-wrapper">
                                     <svg className="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                    <input type="text" placeholder="Атыңыз" value={formData.firstName} onChange={(e) => setFormData({...formData, firstName: e.target.value})} required />
+                                    <input type="text" placeholder="Атыңыз" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value.replace(/\d/g, '') })} required />
                                 </div>
                             </div>
                             <div className="form-group-modern">
                                 <label>Тегі</label>
                                 <div className="input-wrapper">
                                     <svg className="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                    <input type="text" placeholder="Тегіңіз" value={formData.lastName} onChange={(e) => setFormData({...formData, lastName: e.target.value})} required />
+                                    <input type="text" placeholder="Тегіңіз" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value.replace(/\d/g, '') })} required />
                                 </div>
                             </div>
                         </div>
@@ -178,7 +199,7 @@ function Register() {
                             <label>Электрондық пошта</label>
                             <div className="input-wrapper">
                                 <svg className="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                                <input type="email" placeholder="университет поштасы" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} required />
+                                <input type="email" placeholder="поштаңызды жазыңыз" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
                             </div>
                         </div>
 
@@ -209,9 +230,9 @@ function Register() {
                             <label>Пайдаланушы рөлі</label>
                             <div className="input-wrapper">
                                 <svg className="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                                <select 
-                                    value={formData.role} 
-                                    onChange={(e) => setFormData({...formData, role: e.target.value, group_id: ''})}
+                                <select
+                                    value={formData.role}
+                                    onChange={(e) => setFormData({ ...formData, role: e.target.value, group_id: '' })}
                                     className="modern-select"
                                     required
                                 >
@@ -226,10 +247,10 @@ function Register() {
                                 <label>Оқитын тобыңыз</label>
                                 <div className="input-wrapper">
                                     <svg className="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                                    <select 
+                                    <select
                                         className="modern-select"
-                                        value={formData.group_id} 
-                                        onChange={(e) => setFormData({...formData, group_id: e.target.value})} 
+                                        value={formData.group_id}
+                                        onChange={(e) => setFormData({ ...formData, group_id: e.target.value })}
                                         required={formData.role === 'student'}
                                     >
                                         <option value="" disabled>Топты таңдаңыз...</option>
